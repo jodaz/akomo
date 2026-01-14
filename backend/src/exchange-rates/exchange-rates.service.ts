@@ -7,9 +7,9 @@ export class ExchangeRatesService {
   findAll() {
     return {
       rates: [
-        { id: '1', label: 'USD', value: '330,38', currency: 'Bs' },
+        { id: '1', label: 'USD', value: '336,38', currency: 'Bs' },
         { id: '2', label: 'EUR', value: '384,33', currency: 'Bs' },
-        { id: '3', label: 'USDT', value: '568,40', currency: 'Bs' },
+        { id: '3', label: 'USDT', value: '602,40', currency: 'Bs' },
       ],
       lastUpdate: '2026-01-14T14:14:28.000Z',
     };

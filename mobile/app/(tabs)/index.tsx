@@ -1,14 +1,23 @@
-import { View, Text, ScrollView, SafeAreaView, StatusBar, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, SafeAreaView, StatusBar, StyleSheet, ActivityIndicator } from 'react-native';
 import React from 'react';
-
-const EXCHANGE_RATES = [
-  { id: '1', label: 'USD', value: '330,38', currency: 'Bs' },
-  { id: '2', label: 'EUR', value: '384,33', currency: 'Bs' },
-  { id: '3', label: 'USDT', value: '568,40', currency: 'Bs' },
-];
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
+import { useExchangeRates } from '@/hooks/use-exchange-rates';
 
 export default function TasasScreen() {
-  const lastUpdate = "miércoles, 14 de enero de 2026, 02:14:28 p. m.";
+  const { data, isLoading: loading } = useExchangeRates();
+
+  if (loading) {
+    return (
+      <SafeAreaView style={[styles.container, styles.center]}>
+        <ActivityIndicator size="large" color="#14b8a6" />
+      </SafeAreaView>
+    );
+  }
+
+  const formattedDate = data?.lastUpdate
+    ? format(new Date(data.lastUpdate), "dd/MM/yy hh:mm:ss a", { locale: es })
+    : '';
 
   return (
     <SafeAreaView style={styles.container}>
@@ -36,7 +45,7 @@ export default function TasasScreen() {
           <Text style={styles.cardTitle}>Tasas del día</Text>
 
           <View style={styles.ratesList}>
-            {EXCHANGE_RATES.map((rate) => (
+            {data?.rates.map((rate) => (
               <View key={rate.id} style={styles.rateItem}>
                 <Text style={styles.rateLabel}>{rate.label}</Text>
                 <View style={styles.rateValueContainer}>
@@ -49,7 +58,7 @@ export default function TasasScreen() {
 
           <View style={styles.footer}>
             <Text style={styles.updateText}>
-              Última actualización: {lastUpdate}
+              Última actualización: {formattedDate}
             </Text>
           </View>
         </View>
@@ -62,6 +71,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0a0a0a',
+  },
+  center: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   particle: {
     position: 'absolute',
