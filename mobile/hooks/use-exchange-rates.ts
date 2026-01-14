@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 async function fetchExchangeRates(): Promise<ExchangeData> {
-  const response = await fetch(`${API_URL}/exchange-rates`);
+  const response = await fetch(`${API_URL}/api/exchange-rates`);
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }
