@@ -61,11 +61,11 @@ export function RatesCard({ data }: RatesCardProps) {
 const styles = StyleSheet.create({
   card: {
     width: '100%',
-    backgroundColor: '#1c1c1e',
+    backgroundColor: '#448A44',
     borderRadius: 24,
     padding: 24,
     borderWidth: 1,
-    borderColor: '#2c2c2e',
+    borderColor: '#448A44',
   },
   cardTitle: {
     color: '#fff',
@@ -82,12 +82,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderRadius: 16,
-    backgroundColor: '#262628',
+    backgroundColor: '#1B6B3E',
     borderWidth: 1,
-    borderColor: '#333335',
+    borderColor: '#448A44',
   },
   rateLabel: {
-    color: '#9ca3af',
+    color: '#F1C40F',
     fontSize: 18,
     fontWeight: '500',
   },
@@ -103,6 +103,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(20, 184, 166, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
+    color: '#fff',
   },
   rateValueContainer: {
     flexDirection: 'row',
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   rateCurrency: {
-    color: '#9ca3af',
+    color: '#F1C40F',
     fontSize: 18,
   },
   footer: {
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   updateText: {
-    color: '#6b7280',
+    color: '#F1C40F',
     fontSize: 14,
     textAlign: 'center',
     lineHeight: 20,

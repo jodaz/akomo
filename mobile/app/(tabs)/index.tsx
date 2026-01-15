@@ -45,7 +45,7 @@ export default function TasasScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: '#145931',
   },
   center: {
     justifyContent: 'center',
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   headerSubtitle: {
-    color: '#9ca3af',
+    color: '#F1C40F',
     fontSize: 18,
   },
 });

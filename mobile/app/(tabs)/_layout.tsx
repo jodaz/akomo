@@ -1,22 +1,19 @@
 import React from 'react';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Tabs } from 'expo-router';
 import { BarChart2, RefreshCw } from 'lucide-react-native';
 
-import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  useColorScheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarInactiveTintColor: '#448A44',
+        tabBarInactiveTintColor: '#145931',
         tabBarActiveTintColor: '#F1C40F',
         tabBarStyle: {
-          backgroundColor: '#145931',
+          backgroundColor: '#448A44',
           borderTopColor: '#333',
         },
         headerShown: false,

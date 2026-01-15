@@ -1,9 +1,10 @@
-import { View, Text, SafeAreaView, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Switch, ScrollView } from 'react-native';
+import { View, Text, SafeAreaView, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Switch, ScrollView, Image } from 'react-native';
 import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
 import * as Clipboard from 'expo-clipboard';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { DollarSign, Euro } from 'lucide-react-native';
 import { formatNumber, formatInputDisplay } from '@/utils/format';
 
 type FormData = {
@@ -65,9 +66,20 @@ export default function ConvertirScreen() {
 
   const renderCopyButton = (text: string, id: string) => (
     <TouchableOpacity onPress={() => copyToClipboard(text, id)} style={styles.copyButton}>
-      <FontAwesome name={copiedId === id ? "check" : "copy"} size={16} color={copiedId === id ? "#14b8a6" : "#6b7280"} />
+      <FontAwesome name={copiedId === id ? "check" : "copy"} size={16} color={copiedId === id ? "#14b8a6" : "#F1C40F"} />
     </TouchableOpacity>
   );
+
+  const getCurrencyIcon = (currency: string) => {
+    const lower = currency.toLowerCase();
+    if (lower.includes('usdt')) {
+      return <Image source={require('../../assets/images/logos/usdt.png')} style={{ width: 14, height: 14 }} />;
+    }
+    if (lower.includes('eur')) {
+      return <Euro size={14} color="#F1C40F" strokeWidth={3} />;
+    }
+    return <DollarSign size={14} color="#F1C40F" strokeWidth={3} />;
+  };
 
   const renderUnitToBsRow = (label: string, name: keyof FormData, currency: 'USD' | 'EUR' | 'USDT') => {
     const inputValue = watch(name);
@@ -76,7 +88,10 @@ export default function ConvertirScreen() {
     return (
       <View style={styles.inputRow} key={name}>
         <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>{currency}</Text>
+          <View style={styles.labelWithIcon}>
+            {getCurrencyIcon(currency)}
+            <Text style={styles.inputLabel}>{currency}</Text>
+          </View>
           <Controller
             control={control}
             name={name}
@@ -87,7 +102,7 @@ export default function ConvertirScreen() {
                 onChangeText={(text) => onChange(formatInputDisplay(text))}
                 value={value}
                 placeholder="0.00"
-                placeholderTextColor="#666"
+                placeholderTextColor="#ccccccff"
                 keyboardType="decimal-pad"
               />
             )}
@@ -124,7 +139,7 @@ export default function ConvertirScreen() {
                 onChangeText={(text) => onChange(formatInputDisplay(text))}
                 value={value}
                 placeholder="0.00"
-                placeholderTextColor="#666"
+                placeholderTextColor="#ccccccff"
                 keyboardType="decimal-pad"
               />
             )}
@@ -134,7 +149,10 @@ export default function ConvertirScreen() {
         <View style={styles.resultsList}>
            {results.map((item) => (
              <View key={item.currency} style={styles.resultRow}>
-               <Text style={styles.resultRowLabel}>{item.label}</Text>
+                <View style={styles.labelWithIcon}>
+                  {getCurrencyIcon(item.currency)}
+                  <Text style={styles.resultRowLabel}>{item.label}</Text>
+                </View>
                <View style={styles.resultRowValueContainer}>
                  <Text style={styles.resultRowValue}>{formatNumber(item.value)} {item.currency}</Text>
                  {renderCopyButton(formatNumber(item.value), `b2u-${item.currency}`)}
@@ -170,7 +188,7 @@ export default function ConvertirScreen() {
             Divisa → Bs
           </Text>
           <Switch
-            trackColor={{ false: '#333', true: '#14b8a6' }}
+            trackColor={{ false: '#333', true: '#F1C40F' }}
             thumbColor={'#fff'}
             ios_backgroundColor="#333"
             onValueChange={setIsBsToUnit}
@@ -188,7 +206,7 @@ export default function ConvertirScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0a0a0a',
+    backgroundColor: '#448A44',
   },
   center: {
     justifyContent: 'center',
@@ -207,11 +225,11 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '100%',
-    backgroundColor: '#1c1c1e',
+    backgroundColor: '#145931',
     padding: 24,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: '#2c2c2e',
+    borderColor: '#448A44',
     marginBottom: 32,
   },
   inputRow: {
@@ -227,21 +245,27 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   inputLabel: {
-    color: '#9ca3af',
-    marginBottom: 8,
+    color: '#F1C40F',
     fontSize: 14,
+    fontWeight: '600',
+  },
+  labelWithIcon: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
   },
   input: {
-    backgroundColor: '#262628',
+    backgroundColor: '#1B6B3E',
     color: '#fff',
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#333335',
+    borderColor: '#448A44',
     fontSize: 18,
   },
   arrow: {
-    color: '#6b7280',
+    color: '#F1C40F',
     fontSize: 20,
     paddingHorizontal: 12,
     paddingTop: 24,
@@ -261,7 +285,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#2c2c2e',
+    backgroundColor: '#F1C40F',
     marginVertical: 16,
   },
   switchContainer: {
@@ -269,15 +293,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 16,
-    backgroundColor: '#1c1c1e',
     padding: 16,
     borderRadius: 9999,
     alignSelf: 'center',
-    borderWidth: 1,
-    borderColor: '#2c2c2e',
   },
   switchLabel: {
-    color: '#6b7280',
+    color: '#fff',
     fontSize: 16,
     fontWeight: '500',
   },
@@ -297,7 +318,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#2c2c2e',
   },
   resultRowLabel: {
-    color: '#9ca3af',
+    color: '#F1C40F',
     fontSize: 16,
   },
   resultRowValueContainer: {
@@ -312,5 +333,6 @@ const styles = StyleSheet.create({
   },
   copyButton: {
     padding: 4,
+    color: '#F1C40F',
   },
 });
