@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { CreateExchangeRateDto } from './dto/create-exchange-rate.dto';
 import { UpdateExchangeRateDto } from './dto/update-exchange-rate.dto';
+import { BinanceP2PProvider } from './providers/binance-p2p.provider';
 
 @Injectable()
 export class ExchangeRatesService {
+  constructor(private readonly binanceProvider: BinanceP2PProvider) {}
+
   findAll() {
     return {
       rates: [
@@ -30,5 +33,9 @@ export class ExchangeRatesService {
 
   remove(id: number) {
     return `This action removes a #${id} exchangeRate`;
+  }
+
+  async getBinanceAverage(asset: string, fiat: string, tradeType: string) {
+    return this.binanceProvider.getAveragePrice(asset, fiat, tradeType);
   }
 }

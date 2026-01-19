@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ExchangeRatesService } from './exchange-rates.service';
 import { CreateExchangeRateDto } from './dto/create-exchange-rate.dto';
 import { UpdateExchangeRateDto } from './dto/update-exchange-rate.dto';
@@ -15,6 +15,19 @@ export class ExchangeRatesController {
   @Get()
   findAll() {
     return this.exchangeRatesService.findAll();
+  }
+
+  @Get('binance/average')
+  getBinanceAverage(
+    @Query('asset') asset: string,
+    @Query('fiat') fiat: string,
+    @Query('tradeType') tradeType: string,
+  ) {
+    return this.exchangeRatesService.getBinanceAverage(
+      asset || 'USDT',
+      fiat || 'VES',
+      tradeType || 'SELL',
+    );
   }
 
   @Get(':id')
