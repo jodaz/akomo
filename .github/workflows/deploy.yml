@@ -1,0 +1,24 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Stop the old container, start the new one
+            docker stop ${{ secrets.DOLLAR_APP_IMAGE }} || true
+            docker rm ${{ secrets.DOLLAR_APP_IMAGE }} || true
+            docker run -d \
+              --name ${{ secrets.DOLLAR_APP_IMAGE }} \
+              --restart unless-stopped \
+              -p 3000:8080 \
