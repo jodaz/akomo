@@ -56,7 +56,6 @@ const styles = StyleSheet.create({
     borderRadius: 9999,
   },
   scrollContent: {
-    paddingHorizontal: 20,
     paddingTop: 40,
     alignItems: 'center',
     paddingBottom: 40,

@@ -30,18 +30,6 @@ export default function TabLayout() {
           },
         }}
       />
-      <Tabs.Screen
-        name="convert"
-        options={{
-          title: 'OtraAppDelDolarEnVzla',
-          tabBarLabel: 'Convertir',
-          tabBarIcon: ({ color }) => <RefreshCw size={24} color={color} strokeWidth={2} />,
-          tabBarLabelStyle: {
-            fontSize: 13,
-            fontWeight: 'bold',
-          },
-        }}
-      />
     </Tabs>
   );
 }
