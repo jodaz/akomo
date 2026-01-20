@@ -19,6 +19,7 @@ export function useExchangeRates() {
   const query = useQuery({
     queryKey: ['exchangeRates'],
     queryFn: fetchExchangeRates,
+    refetchInterval: 3600 * 1000, // 1 hour
   });
 
   useEffect(() => {
