@@ -1,0 +1,30 @@
+name: Backend CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+jobs:
+  build:
+    name: Build Backend Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          push: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
