@@ -3,6 +3,7 @@ import { CreateExchangeRateDto } from './dto/create-exchange-rate.dto';
 import { UpdateExchangeRateDto } from './dto/update-exchange-rate.dto';
 import { UpdateBcvRatesDto } from './dto/update-bcv-rates.dto';
 import { BinanceP2PProvider } from './providers/binance-p2p.provider';
+import { BcvProvider } from './providers/bcv.provider';
 import { SupabaseService } from '../supabase/supabase.service';
 
 @Injectable()
@@ -11,6 +12,7 @@ export class ExchangeRatesService {
 
   constructor(
     private readonly binanceProvider: BinanceP2PProvider,
+    private readonly bcvProvider: BcvProvider,
     private readonly supabaseService: SupabaseService,
   ) {}
 
@@ -90,6 +92,45 @@ export class ExchangeRatesService {
     return { message: 'BCV rates saved successfully (historical entry)' };
   }
 
+  async syncBcvRates() {
+    this.logger.log('Starting BCV rates sync');
+    try {
+      const rates = await this.bcvProvider.getRates();
+      
+      const newEntries = [
+        {
+          symbol: 'USD',
+          label: 'Dólar BCV',
+          value: rates.usd,
+          provider: 'BCV',
+          currency: 'VES',
+        },
+        {
+          symbol: 'EUR',
+          label: 'Euro BCV',
+          value: rates.eur,
+          provider: 'BCV',
+          currency: 'VES',
+        },
+      ];
+
+      const { error } = await this.supabaseService.getClient()
+        .from('exchange_rates')
+        .insert(newEntries);
+
+      if (error) {
+        this.logger.error(`Error inserting BCV rates during sync: ${error.message}`);
+        throw error;
+      }
+
+      this.logger.log('Successfully synced BCV rates');
+      return rates;
+    } catch (error) {
+      this.logger.error(`Failed to sync BCV rates: ${error.message}`);
+      throw error;
+    }
+  }
+
   // ... other methods ...
   create(createExchangeRateDto: CreateExchangeRateDto) {
     return 'This action adds a new exchangeRate';
@@ -107,11 +148,11 @@ export class ExchangeRatesService {
     return `This action removes a #${id} exchangeRate`;
   }
 
-  async getBinanceAverage(asset: string, fiat: string, tradeType: string) {
+  async getBinanceAverage(asset: string, fiat: string, tradeType: string, updateDb: boolean = false) {
     const price = await this.binanceProvider.getAveragePrice(asset, fiat, tradeType);
     
-    // Proactively update USDT in DB as well if it's USDT
-    if (asset === 'USDT' && fiat === 'VES') {
+    // Update DB only if explicitly requested
+    if (updateDb && asset === 'USDT' && fiat === 'VES') {
       await this.supabaseService.getClient()
         .from('exchange_rates')
         .upsert({

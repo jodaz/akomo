@@ -28,11 +28,13 @@ export class ExchangeRatesController {
     @Query('asset') asset: string,
     @Query('fiat') fiat: string,
     @Query('tradeType') tradeType: string,
+    @Query('update') update: string,
   ) {
     return this.exchangeRatesService.getBinanceAverage(
       asset || 'USDT',
       fiat || 'VES',
       tradeType || 'SELL',
+      update === 'false',
     );
   }
 
