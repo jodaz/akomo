@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, Image, Linking, TouchableOpacity, StatusBar } from 'react-native';
+import { View, StyleSheet, ScrollView, SafeAreaView, Image, Linking, TouchableOpacity, StatusBar } from 'react-native';
+import { Text } from '@/components/Themed';
 import { ExternalLink } from 'lucide-react-native';
 
 export default function InfoScreen() {

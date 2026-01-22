@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, Image, TextInput, TouchableOpacity, Animated, Easing } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity, Animated, Easing } from 'react-native';
+import { Text, TextInput } from '@/components/Themed';
 import { DollarSign, Euro, RotateCcw } from 'lucide-react-native';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
