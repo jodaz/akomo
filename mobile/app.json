@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "OtraAppDelDolarEnVzla",
-    "slug": "otra-app-del-dolar-vzla",
+    "name": "Libera",
+    "slug": "libera",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/favicon.png",
-    "scheme": "otra-app-del-dolar-en-vzla",
+    "scheme": "libera",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.jodaz.otraappdeldolarenvzla",
+      "bundleIdentifier": "com.jodaz.libera",
       "icon": {
         "dark": "./assets/images/ios-dark.png"
       },
@@ -30,7 +30,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.jodaz.otraappdeldolarenvzla"
+      "package": "com.jodaz.libera"
     },
     "web": {
       "bundler": "metro",

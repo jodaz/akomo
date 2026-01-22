@@ -1,4 +1,5 @@
-import { View, Text, ScrollView, SafeAreaView, StatusBar, StyleSheet, ActivityIndicator, Image } from 'react-native';
+import { View, ScrollView, SafeAreaView, StatusBar, StyleSheet, ActivityIndicator, Image } from 'react-native';
+import { Text } from '@/components/Themed';
 import React from 'react';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
 import { RatesCard } from '@/components/RatesCard';
@@ -30,7 +31,7 @@ export default function TasasScreen() {
         <View style={styles.header}>
           <View style={styles.headerTitleRow}>
             <Image source={require('../../assets/images/logo.png')} style={styles.headerIcon} />
-            <Text style={styles.headerTitle}>Otra App del Dolar en Vzla</Text>
+            <Text style={styles.headerTitle}>Libera</Text>
           </View>
           <Text style={styles.headerSubtitle}>Tasas de cambio en Venezuela</Text>
         </View>

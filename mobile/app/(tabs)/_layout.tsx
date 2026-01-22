@@ -21,12 +21,13 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'OtraAppDelDolarEnVzla',
+          title: 'Libera',
           tabBarLabel: 'Tasas',
           tabBarIcon: ({ color }) => <BarChart2 size={24} color={color} strokeWidth={2} />,
           tabBarLabelStyle: {
             fontSize: 13,
             fontWeight: 'bold',
+            fontFamily: 'NotoSans_700Bold',
           },
         }}
       />
@@ -39,6 +40,7 @@ export default function TabLayout() {
           tabBarLabelStyle: {
             fontSize: 13,
             fontWeight: 'bold',
+            fontFamily: 'NotoSans_700Bold',
           },
         }}
       />
