@@ -1,4 +1,5 @@
-import { View, ScrollView, SafeAreaView, StatusBar, StyleSheet, ActivityIndicator, Image, Platform, useWindowDimensions } from 'react-native';
+import { View, ScrollView, SafeAreaView, StatusBar, StyleSheet, ActivityIndicator, Image, Platform, useWindowDimensions, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Text } from '@/components/Themed';
 import React from 'react';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
@@ -10,6 +11,7 @@ import { GradientBackground } from '@/components/GradientBackground';
 export default function TasasScreen() {
   const { data, isLoading: loading } = useExchangeRates();
   const { width } = useWindowDimensions();
+  const router = useRouter();
   const isDesktop = Platform.OS === 'web' && width > 768;
 
   if (loading) {
@@ -31,6 +33,19 @@ export default function TasasScreen() {
           {/* Rates Card Component */}
           <View style={isDesktop ? styles.desktopCardContainer : styles.mobileCardContainer}>
             <RatesCard data={data} />
+            
+            {/* {Platform.OS === 'web' && (
+              <TouchableOpacity 
+                style={styles.downloadButton}
+                onPress={() => router.push('/builds')}
+              >
+                <Image 
+                  source={require('../assets/images/apk-icon.png')} 
+                  style={styles.downloadIcon}
+                />
+                <Text style={styles.downloadButtonText}>Descargar APK</Text>
+              </TouchableOpacity>
+            )} */}
           </View>
 
           <View style={styles.footerButtonContainer}>
@@ -99,6 +114,28 @@ const styles = StyleSheet.create({
   },
   footerButtonText: {
      display: 'none',
+  },
+  downloadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(27, 107, 62, 0.4)',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#1B6B3E',
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+  downloadIcon: {
+    width: 32,
+    height: 32,
+    marginRight: 12,
+  },
+  downloadButtonText: {
+    color: '#F1C40F',
+    fontSize: 18,
+    fontWeight: 'bold',
   }
 });
 
