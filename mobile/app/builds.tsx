@@ -4,11 +4,13 @@ import { Text } from '@/components/Themed';
 import { CreditsFooter } from '@/components/CreditsFooter';
 import { TopHeader } from '@/components/TopHeader';
 import { GradientBackground } from '@/components/GradientBackground';
+import { useRouter } from 'expo-router';
 import { useBuilds, Build } from '@/hooks/use-builds';
-import { Download } from 'lucide-react-native';
+import { Download, ChevronLeft } from 'lucide-react-native';
 
 export default function BuildsScreen() {
   const { width } = useWindowDimensions();
+  const router = useRouter();
   const isDesktop = Platform.OS === 'web' && width > 768;
   const { data: builds, isLoading, error } = useBuilds();
 
@@ -24,6 +26,15 @@ export default function BuildsScreen() {
 
         <ScrollView contentContainerStyle={[styles.scrollContent, isDesktop && styles.desktopScrollContent]}>
           <View style={isDesktop ? styles.desktopCardContainer : styles.mobileCardContainer}>
+            <TouchableOpacity 
+              style={styles.backButton} 
+              onPress={() => router.back()}
+              activeOpacity={0.7}
+            >
+              <ChevronLeft size={24} color="#fff" />
+              <Text style={styles.backButtonText}>Volver</Text>
+            </TouchableOpacity>
+
             <View style={styles.card}>
               <View style={styles.header}>
                 <Text style={styles.title}>Descargas Disponibles</Text>
@@ -154,5 +165,18 @@ const styles = StyleSheet.create({
   footer: {
     alignItems: 'center',
     marginTop: 10,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    paddingVertical: 8,
+    alignSelf: 'flex-start',
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 4,
   },
 });

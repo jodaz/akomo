@@ -34,7 +34,7 @@ export default function TasasScreen() {
           <View style={isDesktop ? styles.desktopCardContainer : styles.mobileCardContainer}>
             <RatesCard data={data} />
             
-            {/* {Platform.OS === 'web' && (
+            {Platform.OS === 'web' && (
               <TouchableOpacity 
                 style={styles.downloadButton}
                 onPress={() => router.push('/builds')}
@@ -45,7 +45,7 @@ export default function TasasScreen() {
                 />
                 <Text style={styles.downloadButtonText}>Descargar APK</Text>
               </TouchableOpacity>
-            )} */}
+            )}
           </View>
 
           <View style={styles.footerButtonContainer}>
