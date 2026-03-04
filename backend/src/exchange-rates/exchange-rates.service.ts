@@ -220,13 +220,30 @@ export class ExchangeRatesService {
           return { symbol, history: [] };
         }
 
-        const history = data.map((item) => ({
+        let history = data.map((item) => ({
           value: item.value,
           date: item.created_at,
         }));
 
-        const currentPrice = history.length > 0 ? history[history.length - 1].value : 0;
-        const initialPrice = history.length > 0 ? history[0].value : 0;
+        if (symbol === 'USDT') {
+          const dailyAverages = data.reduce((acc, item) => {
+            const dateStr = new Date(item.created_at).toISOString().split('T')[0];
+            if (!acc[dateStr]) {
+              acc[dateStr] = { sum: 0, count: 0 };
+            }
+            acc[dateStr].sum += Number(item.value);
+            acc[dateStr].count += 1;
+            return acc;
+          }, {} as Record<string, { sum: number; count: number }>);
+
+          history = Object.keys(dailyAverages).map((dateStr) => ({
+            value: Number((dailyAverages[dateStr].sum / dailyAverages[dateStr].count).toFixed(2)),
+            date: `${dateStr}T00:00:00.000Z`,
+          })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+        }
+
+        const currentPrice = data.length > 0 ? data[data.length - 1].value : 0;
+        const initialPrice = data.length > 0 ? data[0].value : 0;
         const change = initialPrice !== 0 ? ((currentPrice - initialPrice) / initialPrice) * 100 : 0;
 
         return {
