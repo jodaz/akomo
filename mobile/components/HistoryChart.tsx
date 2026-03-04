@@ -1,145 +1,155 @@
-import React, { useRef, useEffect } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-import { SvgChart, SVGRenderer } from '@wuba/react-native-echarts';
-import * as echarts from 'echarts/core';
-import { LineChart } from 'echarts/charts';
-import {
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  LegendComponent,
-} from 'echarts/components';
+import React, { useState } from 'react';
+import { View, StyleSheet, Text, LayoutChangeEvent } from 'react-native';
+import { LineChart } from 'react-native-gifted-charts';
 import { ExchangeHistory } from '@/hooks/use-exchange-history';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-
-echarts.use([
-  SVGRenderer,
-  LineChart,
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  LegendComponent,
-]);
 
 interface Props {
   data: ExchangeHistory[];
   days: number;
 }
 
-const { width } = Dimensions.get('window');
+// Updated colors per user request
+const COLORS = {
+  USD: '#84cc16',   // lime
+  EUR: '#F1C40F',   // yellow
+  USDT: '#f97316',  // orange
+};
 
-export const HistoryChart = ({ data, days }: Props) => {
-  const chartRef = useRef<any>(null);
+const SERIES_LABEL: Record<string, string> = {
+  USD: 'USD BCV',
+  EUR: 'EUR BCV',
+  USDT: 'USDT',
+};
 
-  useEffect(() => {
-    let chart: any;
-    if (chartRef.current) {
-      chart = echarts.init(chartRef.current, 'dark', {
-        renderer: 'svg',
-        width: width - 80,
-        height: 300,
-      });
-      setOption(chart);
-    }
-    return () => chart?.dispose();
-  }, [data]);
+export const HistoryChart = ({ data }: Props) => {
+  // Measure the container width at runtime so the chart fills 100% of its parent
+  const [containerWidth, setContainerWidth] = useState(0);
 
-  const setOption = (chart: any) => {
-    // Process data for echarts
-    // We assume all symbols have historical data for the same dates or at least overlapping
-    // For simplicity, we'll take the dates from the first symbol that has data
-    const firstWithData = data.find(d => d.history.length > 0);
-    if (!firstWithData) return;
-
-    const dates = firstWithData.history.map(h => 
-      format(new Date(h.date), 'd MMM', { locale: es })
-    );
-
-    const series = data.map(symbolData => ({
-      name: symbolData.symbol === 'USD' ? 'USD BCV' : symbolData.symbol === 'EUR' ? 'EUR BCV' : 'USDT',
-      type: 'line',
-      data: symbolData.history.map(h => h.value),
-      smooth: true,
-      showSymbol: false,
-      lineStyle: {
-        width: 3,
-      },
-    }));
-
-    const option = {
-      backgroundColor: 'transparent',
-      color: ['#FFFFFF', '#F1C40F', '#14b8a6'], // USD (White), EUR (Gold), USDT (Cyan)
-      tooltip: {
-        trigger: 'axis',
-        backgroundColor: '#1B6B3E',
-        borderColor: '#448A44',
-        textStyle: {
-          color: '#fff',
-        },
-      },
-      legend: {
-        data: series.map(s => s.name),
-        bottom: 0,
-        textStyle: {
-          color: '#F1C40F',
-        },
-      },
-      grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '15%',
-        top: '10%',
-        containLabel: true,
-      },
-      xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: dates,
-        axisLine: {
-          lineStyle: {
-            color: '#448A44',
-          },
-        },
-        axisLabel: {
-          color: '#F1C40F',
-          fontSize: 10,
-        },
-      },
-      yAxis: {
-        type: 'value',
-        splitLine: {
-          lineStyle: {
-            color: '#145931',
-          },
-        },
-        axisLabel: {
-          color: '#F1C40F',
-          fontSize: 10,
-        },
-      },
-      series: series,
-    };
-
-    chart.setOption(option);
+  const onLayout = (e: LayoutChangeEvent) => {
+    setContainerWidth(e.nativeEvent.layout.width);
   };
 
+  const firstWithData = data.find((d) => d.history.length > 0);
+  if (!firstWithData) return null;
+
+  // Build datasets — label every ~6th point to avoid crowding
+  const buildDataset = (symbolData: ExchangeHistory) =>
+    symbolData.history.map((h, i) => ({
+      value: h.value,
+      label:
+        i % Math.ceil(symbolData.history.length / 6) === 0
+          ? format(new Date(h.date), 'd MMM', { locale: es })
+          : '',
+      labelTextStyle: { color: '#F1C40F', fontSize: 9 },
+      hideDataPoint: true,
+    }));
+
+  // Primary series: prefer USD
+  const primarySymbol = data.find((d) => d.symbol === 'USD') ?? firstWithData;
+  const primaryDataset = buildDataset(primarySymbol);
+  const primaryColor = COLORS[primarySymbol.symbol as keyof typeof COLORS] ?? '#84cc16';
+
+  // Secondary / tertiary series
+  const additionalDatasets = data
+    .filter((d) => d !== primarySymbol && d.history.length > 0)
+    .map((d) => ({
+      data: buildDataset(d),
+      color: COLORS[d.symbol as keyof typeof COLORS] ?? '#aaaaaa',
+      symbol: d.symbol,
+    }));
+
+  // chartWidth is the measured container width minus the yAxis label column (~40px)
+  // Fall back to a safe value until layout fires
+  const chartWidth = containerWidth > 0 ? containerWidth - 40 : 260;
+
   return (
-    <View style={styles.container}>
-      <SvgChart ref={chartRef} />
+    <View style={styles.container} onLayout={onLayout}>
+      {containerWidth > 0 && (
+        <LineChart
+          areaChart={false}
+          data={primaryDataset}
+          data2={additionalDatasets[0]?.data}
+          data3={additionalDatasets[1]?.data}
+          color1={primaryColor}
+          color2={additionalDatasets[0]?.color}
+          color3={additionalDatasets[1]?.color}
+          width={chartWidth}
+          height={220}
+          thickness={2.5}
+          thickness2={2.5}
+          thickness3={2.5}
+          curved
+          hideDataPoints
+          hideDataPoints2
+          hideDataPoints3
+          backgroundColor="transparent"
+          rulesColor="#145931"
+          rulesType="solid"
+          yAxisColor="transparent"
+          xAxisColor="#448A44"
+          yAxisTextStyle={styles.axisLabel}
+          xAxisLabelTextStyle={styles.axisLabel}
+          noOfSections={4}
+          initialSpacing={8}
+          endSpacing={8}
+        />
+      )}
+
+      {/* Legend */}
+      <View style={styles.legend}>
+        {[primarySymbol, ...data.filter((d) => d !== primarySymbol && d.history.length > 0)].map(
+          (d) => (
+            <View key={d.symbol} style={styles.legendItem}>
+              <View
+                style={[
+                  styles.legendDot,
+                  { backgroundColor: COLORS[d.symbol as keyof typeof COLORS] ?? '#aaa' },
+                ]}
+              />
+              <Text style={styles.legendText}>{SERIES_LABEL[d.symbol] ?? d.symbol}</Text>
+            </View>
+          )
+        )}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    height: 320,
     width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(27, 107, 62, 0.35)',
     borderRadius: 16,
-    paddingVertical: 10,
-    marginTop: 20,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#448A44',
+    marginTop: 8,
+  },
+  axisLabel: {
+    color: '#F1C40F',
+    fontSize: 9,
+  },
+  legend: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    gap: 16,
+    marginTop: 12,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  legendDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  legendText: {
+    color: '#F1C40F',
+    fontSize: 12,
   },
 });
