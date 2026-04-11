@@ -12,17 +12,25 @@ import {
 } from 'react-native';
 import { Text } from '@/components/Themed';
 import { useExchangeHistory } from '@/hooks/use-exchange-history';
-import { HistoryChart } from '@/components/HistoryChart';
+// import { HistoryChart } from '@/components/HistoryChart';
 import { GradientBackground } from '@/components/GradientBackground';
 import { TopHeader } from '@/components/TopHeader';
 import { CreditsFooter } from '@/components/CreditsFooter';
-import { ArrowUpRight, ArrowDownRight } from 'lucide-react-native';
+import { ArrowUpRight, ArrowDownRight, TrendingUp } from 'lucide-react-native';
 
 export default function HistoryScreen() {
   const [days, setDays] = useState(7);
   const { data, isLoading } = useExchangeHistory(days);
   const { width } = useWindowDimensions();
   const isDesktop = Platform.OS === 'web' && width > 768;
+
+  // Calculate gaps between USDT and BCV rates
+  const usdtPrice = data?.find(i => i.symbol.toUpperCase().includes('USDT'))?.currentPrice;
+  const usdPrice = data?.find(i => i.symbol === 'USD')?.currentPrice;
+  const eurPrice = data?.find(i => i.symbol === 'EUR')?.currentPrice;
+
+  const usdGap = (usdtPrice && usdPrice) ? ((usdtPrice / usdPrice) - 1) * 100 : 0;
+  const eurGap = (usdtPrice && eurPrice) ? ((usdtPrice / eurPrice) - 1) * 100 : 0;
 
   const renderTab = (value: number, label: string) => {
     const isActive = days === value;
@@ -97,12 +105,36 @@ export default function HistoryScreen() {
               {data?.map((item) => renderRateCard(item.symbol, item.currentPrice, item.change))}
             </View>
 
-            {/* Chart section — card rules: borderRadius 20, padding 24, border */}
+            {/* Gap Section — Breach Analysis */}
+            <View style={styles.gapSection}>
+              <View style={styles.gapHeader}>
+                <TrendingUp size={18} color="#F1C40F" />
+                <Text style={styles.gapTitle}>Brecha Cambiaria</Text>
+              </View>
+              
+              <View style={styles.gapRow}>
+                <Text style={styles.gapLabel}>USDT / USD BCV</Text>
+                <Text style={[styles.gapValue, { color: usdGap >= 0 ? '#F1C40F' : '#14b8a6' }]}>
+                  {usdGap >= 0 ? '+' : ''}{usdGap.toFixed(2)}%
+                </Text>
+              </View>
+
+              <View style={[styles.gapRow, { borderTopWidth: 1, borderTopColor: 'rgba(68, 138, 68, 0.3)', marginTop: 8, paddingTop: 12 }]}>
+                <Text style={styles.gapLabel}>USDT / EUR BCV</Text>
+                <Text style={[styles.gapValue, { color: eurGap >= 0 ? '#F1C40F' : '#14b8a6' }]}>
+                  {eurGap >= 0 ? '+' : ''}{eurGap.toFixed(2)}%
+                </Text>
+              </View>
+            </View>
+
+            {/* Chart section hidden per user request */}
+            {/* 
             <View style={styles.chartSection}>
               <Text style={styles.chartTitle}>Evolución últimos {days} días</Text>
               {data && <HistoryChart data={data} days={days} />}
               <Text style={styles.dataDaysLabel}>{days} días de datos</Text>
             </View>
+            */}
           </View>
 
           <View style={styles.footer}>
@@ -214,7 +246,7 @@ const styles = StyleSheet.create({
   rateChangeNegative: {
     color: '#14b8a6',             // teal-accent for negative change
   },
-  // Chart card: borderRadius 20, padding 24, border per guidelines
+  /* 
   chartSection: {
     backgroundColor: '#1B6B3E',
     borderRadius: 20,
@@ -234,6 +266,41 @@ const styles = StyleSheet.create({
     marginTop: 15,
     fontSize: 12,
     opacity: 0.8,
+  },
+  */
+  gapSection: {
+    backgroundColor: '#155230',    // dark green for breach analysis
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#448A44',
+  },
+  gapHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 16,
+  },
+  gapTitle: {
+    color: '#F1C40F',
+    fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: 'Zain_700Bold',
+  },
+  gapRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  gapLabel: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    opacity: 0.8,
+  },
+  gapValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
   },
   footer: {
     alignItems: 'center',
